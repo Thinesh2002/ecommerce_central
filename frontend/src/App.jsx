@@ -4,10 +4,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./compnents/Layout";
 import ProtectedRoute from "./config/ProtectedRoute";
 
-import Login from "./pages/login";
-import Register from "./pages/user/Register";
-import Dashboard from "./pages/dasboard";
-import User from "./pages/user/user_dashboard";
+import Login from "./Pages/login";
+import Register from "./Pages/user/Register";
+import Dashboard from "./Pages/dasboard";
+import User from "./Pages/user/user_dashboard";
 import TrafficReportAnalysis from "./Pages/Ebay/Ebay _File_Anaysis/eBayTrafficReportComparison";
 import EbayKeywordAnalysis from "./Pages/Ebay/Keyword_Research/index"
 import EbaySellerRoute from "./Pages/Ebay/Ebay_Seller_analysis/index"
