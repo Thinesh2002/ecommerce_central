@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* ===== Disable page scrollbar ===== */
+html,
+body {
+  overflow: hidden;
+}
+
+/* Hide scrollbar but keep scroll */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
