@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  ebaySellerRoute
+  getSellerProfile
 } = require("../../controllers/ebay/seller_analysis");
 
-router.post("/profile", ebaySellerRoute);
+router.post("/profile", getSellerProfile);
 
 module.exports = router;

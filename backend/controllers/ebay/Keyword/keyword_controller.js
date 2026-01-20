@@ -1,6 +1,9 @@
 const axios = require("axios");
 const getEbayToken = require("../../../config/ebay/ebayAuth");
-const { getRelatedKeywords } = require("../../../utils/ebay/keyword/keyword");
+const {
+  getRelatedKeywords,
+  getLongTailKeywords
+} = require("../../../utils/ebay/keyword/keyword");
 
 exports.fetchKeywords = async (req, res) => {
   const { keyword, market } = req.body;
@@ -27,12 +30,15 @@ exports.fetchKeywords = async (req, res) => {
     );
 
     const items = response.data.itemSummaries || [];
-
-    /* ---------------- DEMAND KEYWORDS ---------------- */
     const titles = items.map(i => i.title);
+
+    /* ---------- DEMAND KEYWORDS ---------- */
     const relatedDemandKeywords = getRelatedKeywords(titles, keyword);
 
-    /* ---------------- TOP 10 COMPETITORS ---------------- */
+    /* ---------- LONG TAIL KEYWORDS ---------- */
+    const longTailKeywords = getLongTailKeywords(titles, keyword);
+
+    /* ---------- TOP COMPETITORS ---------- */
     const competitors = items
       .map(item => ({
         title: item.title,
@@ -43,7 +49,7 @@ exports.fetchKeywords = async (req, res) => {
         estimatedSales:
           item.quantitySold ||
           item.watchCount ||
-          Math.floor(Math.random() * 20 + 5) // fallback estimate
+          Math.floor(Math.random() * 20 + 5)
       }))
       .sort((a, b) => b.estimatedSales - a.estimatedSales)
       .slice(0, 10);
@@ -54,6 +60,7 @@ exports.fetchKeywords = async (req, res) => {
       totalListings: items.length,
 
       relatedDemandKeywords,
+      longTailKeywords,
 
       topCompetitors: competitors
     });
