@@ -36,25 +36,7 @@ export default function Sidebar({ onClose }) {
 
         </Section>
 
-        {/* INVENTORY */}
-        <Section title="INVENTORY">
-          <Item to="/inventory" icon={ClipboardList} label="Inventory" onClick={onClose} />
-          <Item to="/logs" icon={ClipboardList} label="Logs" onClick={onClose} />
-        </Section>
 
-                {/* Block */}
-        <Section title="INVENTORY">
-          <Item to="/blog" icon={ClipboardList} label="Blog Dashboard" onClick={onClose} />
-          <Item to="/logs" icon={ClipboardList} label="Logs" onClick={onClose} />
-        </Section>
-
-        {/* FINANCE */}
-        <Section title="FINANCE">
-          <Item to="/ebay-products" icon={Store} label="Daraz Income & Expenses" onClick={onClose} />
-          <Item to="/amazon-products" icon={ShoppingBag} label="TikTok Income & Expenses" onClick={onClose} />
-          <Item to="/shopify-products" icon={Store} label="Website Income & Expenses" onClick={onClose} />
-          
-        </Section>
 
         {/* USER MANAGEMENT */}
         <Section title="USER MANAGEMENT">
