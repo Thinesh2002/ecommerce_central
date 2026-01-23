@@ -32,16 +32,10 @@ export default function Sidebar({ onClose }) {
           <Item to="/traffic-report-analysis" icon={FileText} label="Traffic Report Analysis" onClick={onClose} />
           <Item to="/Keyword-analysis" icon={PlusSquare} label="Keyword Analysis" onClick={onClose} />
           <Item to="/Seller-analysis" icon={User} label="Seller Analysis" onClick={onClose} />
-
-
+          <Item to="/ebay-template" icon={User} label="Template Generater" onClick={onClose} />
         </Section>
 
 
-
-        {/* USER MANAGEMENT */}
-        <Section title="USER MANAGEMENT">
-          <Item to="/user-dashboard" icon={Store} label="Manage Users" onClick={onClose} />
-        </Section>
 
       </div>
     </aside>

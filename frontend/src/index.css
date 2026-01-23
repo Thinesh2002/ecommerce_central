@@ -14,3 +14,14 @@ body {
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
+
+
+/* Add this to your Global CSS or Style block */
+svg > g > g:last-child {
+  pointer-events: none !important;
+}
+.google-visualization-tooltip {
+  pointer-events: none !important;
+  border: none !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}

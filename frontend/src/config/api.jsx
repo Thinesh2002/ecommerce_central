@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const API_BASE_URL = "https://ecommerce-central-backend.teckvora.com";
+export const API_BASE_URL = "http://localhost:5000";
 
 const API = axios.create({
-  baseURL: "https://ecommerce-central-backend.teckvora.com/api"
+  baseURL: "http://localhost:5000/api"
 });
 
 API.interceptors.request.use(cfg => {

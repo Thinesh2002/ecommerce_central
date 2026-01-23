@@ -1,9 +1,6 @@
 const axios = require("axios");
 const getEbayToken = require("../../../config/ebay/ebayAuth");
-const {
-  getRelatedKeywords,
-  getLongTailKeywords
-} = require("../../../utils/ebay/keyword/keyword");
+const { getRelatedKeywords, getLongTailKeywords } = require("../../../utils/ebay/keyword/keyword");
 
 exports.fetchKeywords = async (req, res) => {
   const { keyword, market } = req.body;
@@ -20,7 +17,8 @@ exports.fetchKeywords = async (req, res) => {
       {
         params: {
           q: keyword,
-          limit: 100
+          limit: 100,
+          fieldgroups: "MATCHING_ITEMS,EXTENDED"
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,45 +28,54 @@ exports.fetchKeywords = async (req, res) => {
     );
 
     const items = response.data.itemSummaries || [];
-    const titles = items.map(i => i.title);
+    if (items.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
 
-    /* ---------- DEMAND KEYWORDS ---------- */
-    const relatedDemandKeywords = getRelatedKeywords(titles, keyword);
+    // --- MARKET ANALYSIS ---
+    const prices = items.map(i => parseFloat(i.price?.value || 0)).filter(p => p > 0);
+    const avgPrice = prices.length > 0 ? (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2) : "0.00";
+    
+    // --- DEMAND METRICS ---
+    const demandItems = items.filter(i => (i.watchCount > 0 || i.bidCount > 0)).length;
+    const sellThroughRate = ((demandItems / items.length) * 100).toFixed(2);
+    
+    const totalListings = parseInt(response.data.total) || items.length;
+    const competitionLevel = totalListings > 10000 ? "High" : totalListings > 2000 ? "Medium" : "Low";
 
-    /* ---------- LONG TAIL KEYWORDS ---------- */
-    const longTailKeywords = getLongTailKeywords(titles, keyword);
+    // --- OPPORTUNITY SCORE ---
+    let oppScore = (parseFloat(sellThroughRate) / 10).toFixed(1);
+    if(competitionLevel === "Low") oppScore = (parseFloat(oppScore) + 2).toFixed(1);
+    const opportunityScore = Math.min(oppScore, 10);
 
-    /* ---------- TOP COMPETITORS ---------- */
-    const competitors = items
-      .map(item => ({
-        title: item.title,
-        price: item.price?.value || 0,
-        currency: item.price?.currency || "",
-        seller: item.seller?.username || "N/A",
-        itemUrl: item.itemWebUrl,
-        estimatedSales:
-          item.quantitySold ||
-          item.watchCount ||
-          Math.floor(Math.random() * 20 + 5)
-      }))
-      .sort((a, b) => b.estimatedSales - a.estimatedSales)
-      .slice(0, 10);
+    // --- COMPETITORS ---
+    const processedCompetitors = items.map(item => ({
+      title: item.title,
+      price: item.price?.value || 0,
+      currency: item.price?.currency || "",
+      seller: item.seller?.username || "N/A",
+      itemUrl: item.itemWebUrl,
+      estimatedSales: (item.watchCount || 0) + (item.bidCount || 0),
+      successScore: ((item.watchCount || 0) * 2) + ((item.bidCount || 0) * 5)
+    })).sort((a, b) => b.successScore - a.successScore).slice(0, 20);
 
     res.json({
       searchedKeyword: keyword,
       market,
-      totalListings: items.length,
-
-      relatedDemandKeywords,
-      longTailKeywords,
-
-      topCompetitors: competitors
+      totalListings: totalListings,
+      keywordInfo: { totalCompetition: totalListings, competitionLevel },
+      marketAnalytics: {
+        averagePrice: avgPrice, 
+        sellThroughRate: `${sellThroughRate}%`,
+        opportunityScore: opportunityScore,
+        currency: items[0].price?.currency || ""
+      },
+      relatedDemandKeywords: getRelatedKeywords(items.map(i => i.title), keyword),
+      longTailKeywords: getLongTailKeywords(items.map(i => i.title), keyword),
+      topCompetitors: processedCompetitors
     });
 
   } catch (error) {
-    res.status(500).json({
-      message: "eBay API error",
-      error: error.response?.data || error.message
-    });
+    res.status(500).json({ message: "eBay API Error", error: error.message });
   }
 };

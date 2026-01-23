@@ -187,7 +187,7 @@ const exportCSV = () => {
       .toString()
       .trim();
 
-    obj[ITEM_ID] = `="${rawId}"`;
+    obj[ITEM_ID] = `${rawId}`;
 
     metricsToExport.forEach((m) => {
       const n1 = cleanNumber(file1[m]) ?? 0;

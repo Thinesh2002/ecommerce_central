@@ -11,6 +11,7 @@ import User from "./Pages/user/user_dashboard";
 import TrafficReportAnalysis from "./Pages/Ebay/Ebay _File_Anaysis/eBayTrafficReportComparison";
 import EbayKeywordAnalysis from "./Pages/Ebay/Keyword_Research/index"
 import EbaySellerRoute from "./Pages/Ebay/Ebay_Seller_analysis/index"
+import TemplateRoute from "./pages/Ebay/Template_Generate/index"
 
 import { getStoredUser, getAuthToken } from "./config/auth";
 
@@ -102,6 +103,17 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <EbaySellerRoute />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+                        <Route
+        path="/ebay-template"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <TemplateRoute />
             </Layout>
           </ProtectedRoute>
         }
