@@ -7,6 +7,7 @@ const authRoutes = require("./routes/user_route");
 const ebayKeyword = require("./routes/ebay/keyword_route");
 const ebaySellerRoute = require ("./routes/ebay/seller_analysis_route");
 const GeminiRoute = require ("./routes/gemini/gemini_route");
+const ebayAuditListing = require("./routes/ebay/ListingAuditRoute/audit_route")
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/api/user", authRoutes);
 app.use("/api/ebay-keyword",ebayKeyword);
 app.use("/api/seller", ebaySellerRoute);
 app.use("/api/ai",GeminiRoute);
+app.use("/api/ebay-listing", ebayAuditListing)
 
 
 

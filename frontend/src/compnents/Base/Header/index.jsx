@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Menu, Settings, LogOut, User } from "lucide-react";
+import { Menu as MenuIcon, Settings, LogOut, ChevronDown, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getStoredUser, logout } from "../../../config/auth";
 
@@ -7,10 +7,8 @@ export default function Header({ onMenuClick }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-
   const user = getStoredUser();
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -18,89 +16,67 @@ export default function Header({ onMenuClick }) {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-<header className="relative z-50 h-16 bg-[#0f172a] text-white flex items-center justify-between px-4 sm:px-6 border-b border-white/10">
+    <header className="h-16 sticky top-0 z-50 bg-[#020617]/95 backdrop-blur-xl border-b border-[#1E293B] flex items-center justify-between px-4 sm:px-8">
       
-      {/* LEFT */}
-      <div className="flex items-center gap-3">
-        {/* MOBILE MENU */}
+      {/* LEFT - Menu Toggle */}
+      <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded hover:bg-white/10"
+          className="p-2 rounded-lg bg-[#0F172A] text-slate-400 hover:text-white border border-[#1E293B] transition-all"
         >
-          <Menu size={22} />
+          <MenuIcon size={20} />
         </button>
 
-        <span className="font-semibold text-base sm:text-lg whitespace-nowrap">
-          Central Management System
-        </span>
+        <div className="cursor-pointer" onClick={() => navigate("/dashboard")}>
+          <h1 className="text-white font-bold text-lg tracking-tight leading-none">ebay</h1>
+          <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider">Overview</p>
+        </div>
       </div>
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-2">
-
-      
-        <button
-          onClick={handleLogout}
-          className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition"
-        >
-          <LogOut size={18} />
+      {/* RIGHT - Actions */}
+      <div className="flex items-center gap-3">
+        <button className="p-2 rounded-lg bg-[#0F172A] text-slate-400 hover:text-white relative border border-[#1E293B]">
+          <Bell size={18} />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-sky-400 rounded-full"></span>
         </button>
 
-        {/* DESKTOP DROPDOWN */}
-        <div
-          className="relative hidden lg:block"
-          ref={dropdownRef}
-        >
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#0F172A] hover:bg-[#111827] transition border border-transparent hover:border-[#1E293B]"
           >
-            <User size={18} />
-            <span className="text-sm font-medium">
-              {user?.name || "User"}
-            </span>
-            <Settings size={18} />
+            <div className="w-8 h-8 rounded-full bg-sky-500 text-black flex items-center justify-center font-bold">
+              {user?.name?.[0] || "A"}
+            </div>
+            <div className="hidden sm:block text-left">
+              <p className="text-sm text-white font-medium leading-none">{user?.name || "Admin User"}</p>
+              <p className="text-[11px] text-slate-500 mt-1">Administrator</p>
+            </div>
+            <ChevronDown size={16} className={`text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
           </button>
 
-          {/* DROPDOWN */}
-          <div
-            className={`
-              absolute right-0 mt-2 w-48 bg-[#020617] border border-white/10
-              rounded-xl shadow-xl overflow-hidden transition-all origin-top-right
-              ${open
-                ? "opacity-100 scale-100 visible"
-                : "opacity-0 scale-95 invisible"}
-            `}
-          >
-            <div className="px-4 py-3 border-b border-white/10">
-              <p className="text-sm font-medium text-white">
-                {user?.name}
-              </p>
-              <p className="text-xs text-gray-400 truncate">
-                {user?.email}
-              </p>
+          {open && (
+            <div className="absolute right-0 mt-2 w-56 bg-[#020617] border border-[#1E293B] rounded-xl shadow-xl overflow-hidden z-50">
+              <div className="px-4 py-3 border-b border-[#1E293B]">
+                <p className="text-sm font-medium text-white truncate">{user?.name || "Admin User"}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.email || "admin@example.com"}</p>
+              </div>
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-[#0F172A]">
+                <Settings size={16} /> Settings
+              </button>
+              <button 
+                onClick={() => { logout(); navigate("/login"); }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10"
+              >
+                <LogOut size={16} /> Logout
+              </button>
             </div>
-
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition"
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
-          </div>
+          )}
         </div>
-
       </div>
     </header>
   );

@@ -12,7 +12,9 @@ import TrafficReportAnalysis from "./Pages/Ebay/Ebay _File_Anaysis/eBayTrafficRe
 import EbayKeywordAnalysis from "./Pages/Ebay/Keyword_Research/index"
 import EbaySellerRoute from "./Pages/Ebay/Ebay_Seller_analysis/index"
 import TemplateRoute from "./pages/Ebay/Template_Generate/index"
-
+import ListingAudit from "./Pages/Ebay/Listing_Audit/index"
+import PerformanceCategory from "./Pages/Ebay/Performance tracker/index"
+import TrafficReportCompare from "./Pages/Ebay/traffic_data_analysis/index"
 import { getStoredUser, getAuthToken } from "./config/auth";
 
 import "./index.css";
@@ -119,6 +121,37 @@ export default function App() {
         }
       />
 
+                              <Route
+        path="/listing-audit"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ListingAudit />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+                              <Route
+        path="/performance-tracker"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PerformanceCategory />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+                              <Route
+        path="/trafic-report-compare"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <TrafficReportCompare />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
       {/* FALLBACK */}
       <Route
         path="*"
