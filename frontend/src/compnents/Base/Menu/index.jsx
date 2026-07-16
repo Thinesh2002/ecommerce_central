@@ -53,10 +53,10 @@ export default function Menu({ open, onClose }) {
 
   return (
     <>
-      <div className="fixed inset-0 top-14 z-40 bg-black/20" />
+      <div className="fixed inset-0 top-14 z-40 bg-white/40 backdrop-blur-sm" />
 
       <div ref={wrapperRef} className="fixed left-0 top-14 z-50 flex items-start">
-        <div ref={panelRef} className="w-64 max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-white shadow-xl">
+        <div ref={panelRef} className="w-64 h-[calc(100vh-3.5rem)] overflow-y-auto bg-white shadow-xl">
           <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
             <button
               type="button"
