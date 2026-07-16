@@ -59,6 +59,11 @@ CALL add_index_if_missing('users', 'idx_users_role', 'INDEX `idx_users_role` (`r
 CALL add_index_if_missing('users', 'idx_users_team_id', 'INDEX `idx_users_team_id` (`team_id`)');
 CALL add_index_if_missing('users', 'idx_users_staff_id', 'INDEX `idx_users_staff_id` (`staff_id`)');
 
+-- Some legacy `users` tables were created with `id` as a plain PRIMARY KEY, missing
+-- AUTO_INCREMENT - every INSERT that doesn't supply an id then fails with
+-- "Field 'id' doesn't have a default value". Safe to re-run even if already set.
+ALTER TABLE users MODIFY id INT NOT NULL AUTO_INCREMENT;
+
 -- Bootstrap first admin after migration. Replace email with your real admin login.
 -- UPDATE users SET role='admin', status='Active', team_id=1 WHERE email='your-admin@email.com';
 

@@ -58,80 +58,104 @@ export default function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl bg-[#020617] border border-white/10 rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-semibold mb-2 text-center text-white">Create User Access</h2>
-        <p className="text-sm text-gray-400 text-center mb-6">
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">User Access</p>
+        <h1 className="text-xl font-bold text-slate-900">Create User Access</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Admin can create all roles. Team leaders can create users only inside their own team.
         </p>
+      </div>
 
+      <div className="max-w-3xl rounded-sm border border-[#D5D9D9] bg-white p-6">
         {msg && (
-          <div className={`mb-4 text-sm px-4 py-2 rounded-lg border ${msg.type === "success" ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30" : "text-red-300 bg-red-500/10 border-red-500/30"}`}>
+          <div
+            className={`mb-4 rounded-sm border px-4 py-2.5 text-sm font-medium ${
+              msg.type === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "border-red-200 bg-red-50 text-red-700"
+            }`}
+          >
             {msg.text}
           </div>
         )}
 
-        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={submit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Input name="name" value={form.name} onChange={change} placeholder="Full Name" required />
           <Input name="user_id" value={form.user_id} onChange={change} placeholder="User ID" required />
           <Input type="email" name="email" value={form.email} onChange={change} placeholder="Email Address" required />
           <Input type="password" name="password" value={form.password} onChange={change} placeholder="Password" required />
 
-          <div>
-            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Role</label>
+          <Field label="Role">
             <select
               name="role"
               value={form.role}
               onChange={change}
               disabled={!isAdmin(currentUser)}
-              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+              className={selectClass}
             >
               <option value="user">{roleLabel("user")}</option>
               <option value="team_leader">{roleLabel("team_leader")}</option>
               <option value="admin">{roleLabel("admin")}</option>
             </select>
-          </div>
+          </Field>
 
-          <div>
-            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Team</label>
+          <Field label="Team">
             <select
               name="team_id"
               value={form.team_id || ""}
               onChange={change}
               disabled={isTeamLeader(currentUser)}
-              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+              className={selectClass}
             >
               <option value="">Select team</option>
-              {teams.map((team) => <option key={team.team_id} value={team.team_id}>{team.team_name}</option>)}
+              {teams.map((team) => (
+                <option key={team.team_id} value={team.team_id}>
+                  {team.team_name}
+                </option>
+              ))}
             </select>
-          </div>
+          </Field>
 
-          <div>
-            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Linked Staff Profile</label>
-            <select
-              name="staff_id"
-              value={form.staff_id || ""}
-              onChange={change}
-              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+          <Field label="Linked Staff Profile">
+            <select name="staff_id" value={form.staff_id || ""} onChange={change} className={selectClass}>
               <option value="">Optional</option>
-              {staff.map((item) => <option key={item.staff_id} value={item.staff_id}>{item.staff_name}</option>)}
+              {staff.map((item) => (
+                <option key={item.staff_id} value={item.staff_id}>
+                  {item.staff_name}
+                </option>
+              ))}
             </select>
-          </div>
+          </Field>
 
-          <div>
-            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Status</label>
-            <select name="status" value={form.status} onChange={change} className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <Field label="Status">
+            <select name="status" value={form.status} onChange={change} className={selectClass}>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
-          </div>
+          </Field>
 
-          <button type="submit" disabled={loading} className="md:col-span-2 w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-semibold transition disabled:opacity-60">
-            {loading ? "Creating access..." : "Create User Access"}
+          <button
+            type="submit"
+            disabled={loading}
+            className="md:col-span-2 w-full rounded-sm bg-slate-900 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+          >
+            {loading ? "Creating access…" : "Create User Access"}
           </button>
         </form>
       </div>
+    </div>
+  );
+}
+
+const selectClass =
+  "mt-1 w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:opacity-60";
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="text-xs font-bold uppercase tracking-wider text-slate-400">{label}</label>
+      {children}
     </div>
   );
 }
@@ -140,7 +164,7 @@ function Input(props) {
   return (
     <input
       {...props}
-      className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
     />
   );
 }
