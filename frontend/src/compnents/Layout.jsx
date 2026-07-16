@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Base/Header";
 import Menu from "./Base/Menu";
 import Footer from "./Base/Footer";
 
 export default function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-[#EAEDED] text-slate-900 font-sans">
