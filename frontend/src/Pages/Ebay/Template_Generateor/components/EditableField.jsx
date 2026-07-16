@@ -4,7 +4,7 @@ import React from 'react';
 export function EditableText({ value, onChange, placeholder, as = 'input', className = '', style }) {
   const shared =
     `bg-transparent border border-transparent hover:border-slate-300 focus:border-slate-400 ` +
-    `focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-200 rounded px-1 -mx-1 ` +
+    `focus:bg-white focus:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200 rounded px-1 -mx-1 ` +
     `transition-colors cursor-text w-full ${className}`;
 
   if (as === 'textarea') {

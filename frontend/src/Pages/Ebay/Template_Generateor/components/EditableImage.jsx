@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, ImageOff } from 'lucide-react';
 
 // Image with a hover "Change" control that reveals a URL field - click the image
-// itself to swap it out, no separate form panel needed.
+// itself to swap it out, no separate form panel needed. Falls back to a clean
+// square placeholder (instead of the browser's broken-image icon) whenever the
+// URL doesn't load, so the layout always looks intentional.
 export default function EditableImage({ src, alt, onChange, className = '', imgClassName = '', style }) {
   const [editing, setEditing] = useState(false);
+  const [broken, setBroken] = useState(false);
 
   return (
     <div className={`relative group ${className}`} style={style}>
-      <img src={src} alt={alt} className={imgClassName} />
+      {src && !broken ? (
+        <img src={src} alt={alt} className={imgClassName} onError={() => setBroken(true)} onLoad={() => setBroken(false)} />
+      ) : (
+        <div className={`flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-300 bg-slate-100 text-slate-400 ${imgClassName}`}>
+          <ImageOff size={22} />
+          <span className="text-[11px] font-semibold">No image</span>
+        </div>
+      )}
       <button
         type="button"
         onClick={() => setEditing((v) => !v)}
@@ -23,7 +33,10 @@ export default function EditableImage({ src, alt, onChange, className = '', imgC
             autoFocus
             type="text"
             value={src || ''}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              setBroken(false);
+              onChange(e.target.value);
+            }}
             onBlur={() => setEditing(false)}
             onKeyDown={(e) => e.key === 'Enter' && setEditing(false)}
             placeholder="Image URL"

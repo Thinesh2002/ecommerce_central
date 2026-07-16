@@ -1,4 +1,5 @@
 import React from 'react';
+import EditableImage from '../../EditableImage';
 
 export default function DualImageTextModule({ data, updateModule, styles, mode }) {
   const isMobile = mode === 'mobile';
@@ -68,39 +69,48 @@ export default function DualImageTextModule({ data, updateModule, styles, mode }
 
         <div className="space-y-4">
           {safeItems.map((item, idx) => (
-            <div key={idx} className="border-l-2 border-orange-500 pl-3 space-y-2">
-              <span className="text-[10px] font-bold uppercase text-blue-600">Dual Grid Image Vector {idx + 1}</span>
-              
-              <input 
-                type="text" 
-                value={item.img} 
-                placeholder="Image Link Upload URL" 
-                onChange={e => handleItemChange(idx, 'img', e.target.value)} 
-                className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-800 font-mono focus:outline-none" 
+            <div key={idx} className="flex gap-3 border-l-2 border-slate-300 pl-3">
+              <EditableImage
+                src={item.img}
+                alt={item.altText}
+                onChange={(v) => handleItemChange(idx, 'img', v)}
+                className="w-20 shrink-0"
+                imgClassName="h-20 w-20 rounded object-cover"
               />
-              
-              <input 
-                type="text" 
-                value={item.altText || ''} 
-                placeholder="Image Alt Text (SEO ~80 chars)" 
-                onChange={e => handleItemChange(idx, 'altText', e.target.value)} 
-                className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-emerald-700 focus:outline-none" 
-              />
-              
-              <input 
-                type="text" 
-                value={item.text} 
-                placeholder="Aspect Label Title Text" 
-                onChange={e => handleItemChange(idx, 'text', e.target.value)} 
-                className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-900 font-bold focus:outline-none" 
-              />
+              <div className="flex-1 space-y-2">
+                <span className="text-[10px] font-bold uppercase text-slate-500">Image {idx + 1}</span>
 
-              <textarea 
-                value={item.desc || ''} 
-                placeholder="Item Short Description Text" 
-                onChange={e => handleItemChange(idx, 'desc', e.target.value)} 
-                className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-600 h-12 resize-none focus:outline-none" 
-              />
+                <input
+                  type="text"
+                  value={item.img}
+                  placeholder="Image Link Upload URL"
+                  onChange={e => handleItemChange(idx, 'img', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-800 font-mono focus:outline-none"
+                />
+
+                <input
+                  type="text"
+                  value={item.altText || ''}
+                  placeholder="Image Alt Text (SEO ~80 chars)"
+                  onChange={e => handleItemChange(idx, 'altText', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-emerald-700 focus:outline-none"
+                />
+
+                <input
+                  type="text"
+                  value={item.text}
+                  placeholder="Aspect Label Title Text"
+                  onChange={e => handleItemChange(idx, 'text', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-900 font-bold focus:outline-none"
+                />
+
+                <textarea
+                  value={item.desc || ''}
+                  placeholder="Item Short Description Text"
+                  onChange={e => handleItemChange(idx, 'desc', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-xs text-slate-600 h-12 resize-none focus:outline-none"
+                />
+              </div>
             </div>
           ))}
         </div>

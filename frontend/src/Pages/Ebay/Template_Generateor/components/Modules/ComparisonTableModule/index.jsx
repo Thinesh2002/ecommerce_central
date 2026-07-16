@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EditableImage from '../../EditableImage';
 
 export default function ComparisonTableModule({ data, updateModule, styles, mode }) {
   const isMobile = mode === 'mobile';
@@ -167,20 +168,30 @@ export default function ComparisonTableModule({ data, updateModule, styles, mode
                   <input type="text" value={header} onChange={e => {
                     const next = [...safeHeaders]; next[actualIdx] = e.target.value; updateStateField('headers', next);
                   }} className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-800 p-1.5 rounded font-bold focus:outline-none focus:border-blue-500" />
-                  
-                  <div className="space-y-1.5">
-                    <input type="text" value={safeImages[index] || ''} onChange={e => {
-                      const next = [...safeImages]; next[index] = e.target.value; updateStateField('images', next);
-                    }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-slate-600 p-1.5 rounded focus:outline-none" placeholder="Image URL" />
-                    
-                    {/* NEW: Alt text field specific to this comparison item inside the editor sidebar */}
-                    <input type="text" value={safeAltTexts[index] || ''} onChange={e => {
-                      const next = [...safeAltTexts]; next[index] = e.target.value; updateStateField('altTexts', next);
-                    }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-emerald-700 p-1.5 rounded focus:outline-none" placeholder="Image Alt Text (SEO ~80 chars)" />
 
-                    <input type="text" value={safeCartLinks[index] || ''} onChange={e => {
-                      const next = [...safeCartLinks]; next[index] = e.target.value; updateStateField('cartLinks', next);
-                    }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-amber-600 p-1.5 rounded focus:outline-none" placeholder="Buy Now Link" />
+                  <div className="flex gap-2">
+                    <EditableImage
+                      src={safeImages[index]}
+                      alt={safeAltTexts[index]}
+                      onChange={(v) => {
+                        const next = [...safeImages]; next[index] = v; updateStateField('images', next);
+                      }}
+                      className="w-16 shrink-0"
+                      imgClassName="h-16 w-16 rounded object-cover"
+                    />
+                    <div className="flex-1 space-y-1.5">
+                      <input type="text" value={safeImages[index] || ''} onChange={e => {
+                        const next = [...safeImages]; next[index] = e.target.value; updateStateField('images', next);
+                      }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-slate-600 p-1.5 rounded focus:outline-none" placeholder="Image URL" />
+
+                      <input type="text" value={safeAltTexts[index] || ''} onChange={e => {
+                        const next = [...safeAltTexts]; next[index] = e.target.value; updateStateField('altTexts', next);
+                      }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-emerald-700 p-1.5 rounded focus:outline-none" placeholder="Image Alt Text (SEO ~80 chars)" />
+
+                      <input type="text" value={safeCartLinks[index] || ''} onChange={e => {
+                        const next = [...safeCartLinks]; next[index] = e.target.value; updateStateField('cartLinks', next);
+                      }} className="w-full bg-slate-50 border border-slate-200 text-[10px] text-amber-600 p-1.5 rounded focus:outline-none" placeholder="Buy Now Link" />
+                    </div>
                   </div>
                 </div>
               );

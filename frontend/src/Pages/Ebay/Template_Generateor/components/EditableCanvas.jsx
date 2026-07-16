@@ -258,19 +258,29 @@ export default function EditableCanvas({
             className="max-w-50 text-lg font-extrabold"
             style={{ color: styles.primaryColor }}
           />
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             {headerData.shopLinks.map((link) => (
-              <EditableText
-                key={link.id}
-                value={link.label}
-                onChange={(v) =>
-                  setHeaderData({
-                    ...headerData,
-                    shopLinks: headerData.shopLinks.map((l) => (l.id === link.id ? { ...l, label: v } : l)),
-                  })
-                }
-                className="w-auto max-w-30 text-sm font-semibold"
-              />
+              <div key={link.id} className="group/link flex items-center gap-1 rounded-sm bg-white/10 px-1.5">
+                <EditableText
+                  value={link.label}
+                  onChange={(v) =>
+                    setHeaderData({
+                      ...headerData,
+                      shopLinks: headerData.shopLinks.map((l) => (l.id === link.id ? { ...l, label: v } : l)),
+                    })
+                  }
+                  className="w-auto max-w-30 text-sm font-semibold"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setHeaderData({ ...headerData, shopLinks: headerData.shopLinks.filter((l) => l.id !== link.id) })
+                  }
+                  className="cursor-pointer text-xs opacity-0 transition-opacity group-hover/link:opacity-70 hover:opacity-100!"
+                >
+                  <X size={12} />
+                </button>
+              </div>
             ))}
             <button
               type="button"
@@ -280,15 +290,16 @@ export default function EditableCanvas({
                   shopLinks: [...headerData.shopLinks, { id: Date.now().toString(), label: 'New Link', url: '#' }],
                 })
               }
-              className="cursor-pointer rounded-sm border border-current px-2 py-0.5 text-xs opacity-70 hover:opacity-100"
+              className="flex cursor-pointer items-center gap-1 rounded-sm bg-white/15 px-2 py-1 text-xs font-semibold hover:bg-white/25"
             >
-              + Link
+              <Plus size={12} />
+              Link
             </button>
           </div>
           <button
             type="button"
             onClick={() => setStyleOpen((v) => !v)}
-            className="flex cursor-pointer items-center gap-1 rounded-sm border border-current px-2 py-1 text-xs font-semibold opacity-80 hover:opacity-100"
+            className="flex cursor-pointer items-center gap-1 rounded-sm bg-white/15 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/25"
           >
             <Palette size={13} />
             Style

@@ -1,4 +1,5 @@
 import React from 'react';
+import EditableImage from '../../EditableImage';
 
 export default function FourImageTextModule({ data, updateModule, styles, mode }) {
   const isMobile = mode === 'mobile';
@@ -81,17 +82,26 @@ export default function FourImageTextModule({ data, updateModule, styles, mode }
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {safeItems.map((item, idx) => (
             <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
-              <span className="text-[10px] text-blue-600 font-bold block">Grid Item #{idx + 1}</span>
-              
-              <input 
-                type="text" 
-                value={item.img} 
-                placeholder="Image URL" 
-                onChange={e => handleItemChange(idx, 'img', e.target.value)} 
-                className="w-full bg-white border border-slate-200 rounded p-1.5 text-xs text-slate-800 font-mono focus:outline-none" 
+              <div className="flex items-center gap-2">
+                <EditableImage
+                  src={item.img}
+                  alt={item.altText}
+                  onChange={(v) => handleItemChange(idx, 'img', v)}
+                  className="w-14 shrink-0"
+                  imgClassName="h-14 w-14 rounded object-cover"
+                />
+                <span className="text-[10px] text-slate-500 font-bold block">Grid Item #{idx + 1}</span>
+              </div>
+
+              <input
+                type="text"
+                value={item.img}
+                placeholder="Image URL"
+                onChange={e => handleItemChange(idx, 'img', e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded p-1.5 text-xs text-slate-800 font-mono focus:outline-none"
               />
-              
-              <input 
+
+              <input
                 type="text" 
                 value={item.altText || ''} 
                 placeholder="Image Alt Text (SEO ~80 chars)" 
