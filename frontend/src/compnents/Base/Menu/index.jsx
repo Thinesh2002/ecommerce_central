@@ -53,7 +53,7 @@ export default function Menu({ open, onClose }) {
 
   return (
     <>
-      <div className="fixed inset-0 top-14 z-40 bg-white/40 backdrop-blur-sm" />
+      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
 
       <div ref={wrapperRef} className="fixed left-0 top-14 z-50 flex items-start">
         <div ref={panelRef} className="w-64 h-[calc(100vh-3.5rem)] overflow-y-auto bg-white shadow-xl">
