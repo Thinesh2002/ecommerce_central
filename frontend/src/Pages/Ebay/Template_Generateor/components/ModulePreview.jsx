@@ -4,10 +4,10 @@ import generateHtml from '../utils/generateHtml';
 // Renders the exact same HTML string that Copy/Download produce, inside an iframe.
 // This guarantees the live preview and the exported template can never drift apart -
 // what you see here is byte-identical to what you copy.
-export default function ModulePreview({ mode, styles, headerData, modules, faqs }) {
+export default function ModulePreview({ mode, styles, headerData, modules }) {
   const iframeRef = useRef(null);
   const [height, setHeight] = useState(400);
-  const html = generateHtml({ styles, headerData, modules, faqs });
+  const html = generateHtml({ styles, headerData, modules });
 
   const resize = () => {
     const doc = iframeRef.current?.contentDocument;

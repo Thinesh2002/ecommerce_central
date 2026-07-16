@@ -2,11 +2,10 @@
 // exact string (via iframe), so what you see in the editor/PC/mobile views is
 // always byte-identical to what Copy/Download produce - no more drift between a
 // separate "preview" implementation and the exported markup.
-export default function generateHtml({ styles = {}, headerData = {}, modules = [], faqs = [] }) {
+export default function generateHtml({ styles = {}, headerData = {}, modules = [] }) {
   const safeHeaderData = headerData || { storeName: "My Store", storeLink: "#", shopLinks: [] };
   const safeStyles = styles || {};
   const safeModules = modules || [];
-  const safeFaqs = faqs || [];
 
   return `<!DOCTYPE html>
 <html>
@@ -20,7 +19,7 @@ export default function generateHtml({ styles = {}, headerData = {}, modules = [
 
     /* Header layout */
     .ap-header { background-color: ${safeStyles.headerBg || '#131921'}; color: ${safeStyles.headerText || '#ffffff'}; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
-    .ap-header a { color: ${safeStyles.headerText || '#ffffff'}; text-decoration: none; font-weight: 600; font-size: 14px; margin-left: 20px; transition: opacity 0.2s; }
+    .ap-header a { color: ${safeStyles.headerText || '#ffffff'}; text-decoration: none; font-weight: 600; font-size: 14px; margin-left: 20px; transition: opacity 0.2s; cursor: pointer; }
     .ap-header a:hover { opacity: 0.8; text-decoration: underline; }
     .ap-header .ap-logo { color: ${safeStyles.primaryColor || '#ff9900'} !important; font-size: 18px; font-weight: 800; margin-left: 0; text-decoration: none !important; }
 
@@ -93,7 +92,7 @@ export default function generateHtml({ styles = {}, headerData = {}, modules = [
     .ap-table-img-box { height: 144px; width: 128px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #edf2f7; padding: 10px; border-radius: 12px; margin: 0 auto 12px auto; overflow: hidden; }
     .ap-table-img-box img { max-height: 100%; max-width: 100%; object-fit: contain; mix-blend-multiply: true; }
 
-    .ap-table-btn { display: inline-block; width: 100%; max-width: 120px; color: #000000; font-weight: 700; padding: 6px 12px; border-radius: 9999px; text-decoration: none; font-size: 10px; border: 1px solid #d97706; background: #fbbf24; text-align: center; margin-top: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .ap-table-btn { display: inline-block; width: 100%; max-width: 120px; color: #000000; font-weight: 700; padding: 6px 12px; border-radius: 9999px; text-decoration: none; font-size: 10px; border: 1px solid #d97706; background: #fbbf24; text-align: center; margin-top: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; }
     .ap-table-btn:hover { background: #f59e0b; }
     .ap-badge-yes { color: #10b981; font-weight: 900; font-size: 16px; }
     .ap-badge-no { color: #ef4444; font-weight: 900; font-size: 14px; }
@@ -309,22 +308,27 @@ export default function generateHtml({ styles = {}, headerData = {}, modules = [
             </div>
           </div>`;
         }
+        if (m.type === 'faq') {
+          const state = m.extraData || { items: [] };
+          const items = state.items || [];
+          if (!items.length) return '';
+          return `
+          <div class="ap-module ap-faq">
+            <div class="ap-faq-title">Frequently Asked Questions</div>
+            <div class="ap-faq-grid">
+              ${items.map(f => `
+                <div class="ap-faq-node">
+                  <p class="ap-faq-q"><span>Q:</span> ${f.question}</p>
+                  <p class="ap-faq-a">${f.answer}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+        }
+
         return '';
       }).join('')}
     </div>
-
-    ${safeFaqs.length > 0 ? `
-    <div class="ap-faq">
-      <div class="ap-faq-title">Frequently Asked Questions</div>
-      <div class="ap-faq-grid">
-        ${safeFaqs.map(f => `
-          <div class="ap-faq-node">
-            <p class="ap-faq-q"><span>Q:</span> ${f.question}</p>
-            <p class="ap-faq-a">${f.answer}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>` : ''}
   </div>
 </body>
 </html>`;

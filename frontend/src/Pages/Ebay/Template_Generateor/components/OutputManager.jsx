@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Copy, Download, RotateCcw, Check } from 'lucide-react';
 import generateHtml from '../utils/generateHtml';
 
-export default function OutputManager({ styles = {}, headerData = {}, modules = [], faqs = [] }) {
+export default function OutputManager({ styles = {}, headerData = {}, modules = [] }) {
   const [copied, setCopied] = useState(false);
-  const generated = generateHtml({ styles, headerData, modules, faqs });
+  const generated = generateHtml({ styles, headerData, modules });
 
   // null means "not hand-edited" - always mirrors the generated HTML. Once the user
   // types in the textarea, their edits are kept as-is (not silently overwritten by
