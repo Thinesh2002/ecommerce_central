@@ -121,13 +121,13 @@ export default function Dashboard() {
                 icon={ListTodo}
                 label="Total Tasks"
                 value={loading ? "…" : stats.totalTasks}
-                accent="bg-blue-50 text-blue-600"
+                accent="bg-slate-100 text-slate-600"
               />
               <StatTile
                 icon={Clock}
                 label="Hours Logged"
                 value={loading ? "…" : stats.totalHours}
-                accent="bg-amber-50 text-amber-600"
+                accent="bg-slate-100 text-slate-600"
               />
               <StatTile
                 icon={CheckCircle2}
@@ -142,7 +142,7 @@ export default function Dashboard() {
               icon={Users}
               label="Team Members"
               value={loading ? "…" : stats.teamMembers}
-              accent="bg-violet-50 text-violet-600"
+              accent="bg-slate-100 text-slate-600"
             />
           )}
           {!canReadTeam && canReadUsers && (
@@ -150,7 +150,7 @@ export default function Dashboard() {
               icon={Users}
               label="Total Users"
               value={loading ? "…" : stats.totalUsers}
-              accent="bg-violet-50 text-violet-600"
+              accent="bg-slate-100 text-slate-600"
             />
           )}
         </div>
@@ -168,7 +168,7 @@ export default function Dashboard() {
               className="group flex items-center justify-between gap-2 bg-white p-4 hover:bg-slate-50 transition-colors"
             >
               <span className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-slate-50 text-slate-500 group-hover:text-[#FF9900]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-slate-50 text-slate-500 group-hover:text-slate-900">
                   <Icon size={16} />
                 </span>
                 <span className="text-sm font-semibold text-slate-700 truncate">{label}</span>
