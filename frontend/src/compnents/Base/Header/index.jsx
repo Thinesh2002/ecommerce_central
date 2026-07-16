@@ -1,81 +1,90 @@
-import { useState, useRef, useEffect } from "react";
-import { Menu as MenuIcon, Settings, LogOut, ChevronDown, Bell } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Menu, LogOut, X } from "lucide-react";
 import { getStoredUser, logout } from "../../../config/auth";
+import { clearMyPermissions, roleLabel } from "../../../config/permissions";
 
-export default function Header({ onMenuClick }) {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+export default function Header({ onMenuClick, sidebarOpen }) {
+  const [now, setNow] = useState(new Date());
   const navigate = useNavigate();
   const user = getStoredUser();
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
+  const liveTime = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Colombo",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(now);
+
+  const liveDate = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Colombo",
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(now);
+
+  const handleLogout = () => {
+    logout();
+    clearMyPermissions();
+    navigate("/login");
+  };
+
   return (
-    <header className="h-16 sticky top-0 z-50 bg-[#020617]/95 backdrop-blur-xl border-b border-[#1E293B] flex items-center justify-between px-4 sm:px-8">
-      
-      {/* LEFT - Menu Toggle */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onMenuClick}
-          className="p-2 rounded-lg bg-[#0F172A] text-slate-400 hover:text-white border border-[#1E293B] transition-all"
-        >
-          <MenuIcon size={20} />
-        </button>
-
-        <div className="cursor-pointer" onClick={() => navigate("/dashboard")}>
-          <h1 className="text-white font-bold text-lg tracking-tight leading-none">ebay</h1>
-          <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider">Overview</p>
-        </div>
-      </div>
-
-      {/* RIGHT - Actions */}
-      <div className="flex items-center gap-3">
-        <button className="p-2 rounded-lg bg-[#0F172A] text-slate-400 hover:text-white relative border border-[#1E293B]">
-          <Bell size={18} />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-sky-400 rounded-full"></span>
-        </button>
-
-        <div className="relative" ref={dropdownRef}>
+    <header className="sticky top-0 z-40 h-12 border-b border-slate-200 bg-white shadow-sm">
+      <div className="h-full flex items-center justify-between gap-3 px-2 sm:px-4">
+        {/* LEFT: MENU + HEADING */}
+        <div className="flex items-center gap-2 min-w-0">
           <button
-            onClick={() => setOpen(!open)}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#0F172A] hover:bg-[#111827] transition border border-transparent hover:border-[#1E293B]"
+            type="button"
+            onClick={onMenuClick}
+            className="cursor-pointer rounded-md p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 lg:hidden"
+            aria-label="Toggle menu"
           >
-            <div className="w-8 h-8 rounded-full bg-sky-500 text-black flex items-center justify-center font-bold">
-              {user?.name?.[0] || "A"}
-            </div>
-            <div className="hidden sm:block text-left">
-              <p className="text-sm text-white font-medium leading-none">{user?.name || "Admin User"}</p>
-              <p className="text-[11px] text-slate-500 mt-1">Administrator</p>
-            </div>
-            <ChevronDown size={16} className={`text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
-          {open && (
-            <div className="absolute right-0 mt-2 w-56 bg-[#020617] border border-[#1E293B] rounded-xl shadow-xl overflow-hidden z-50">
-              <div className="px-4 py-3 border-b border-[#1E293B]">
-                <p className="text-sm font-medium text-white truncate">{user?.name || "Admin User"}</p>
-                <p className="text-xs text-slate-500 truncate">{user?.email || "admin@example.com"}</p>
-              </div>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-[#0F172A]">
-                <Settings size={16} /> Settings
-              </button>
-              <button 
-                onClick={() => { logout(); navigate("/login"); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10"
-              >
-                <LogOut size={16} /> Logout
-              </button>
+          <h1 className="text-sm sm:text-base font-black text-slate-800 tracking-wide truncate">
+            Digitweb eBay Team Dashboard
+          </h1>
+        </div>
+
+        {/* RIGHT: TIME + USER + LOGOUT */}
+        <div className="flex items-center gap-4 shrink-0">
+          <div className="text-right leading-none hidden sm:block">
+            <p className="text-sm font-black text-slate-800 tracking-wide">{liveTime}</p>
+            <p className="text-[10px] text-slate-400 font-bold mt-1">{liveDate}</p>
+          </div>
+
+          {user && (
+            <div className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5">
+              <span className="text-xs font-bold text-slate-700 truncate max-w-35">
+                {user.name || user.email || user.user_id}
+              </span>
+              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100">
+                {roleLabel(user.role)}
+              </span>
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            aria-label="Logout"
+          >
+            <LogOut size={14} />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
         </div>
       </div>
     </header>

@@ -1,17 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import API from "../../config/api";
-import { storeAuth } from "../../config/auth";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getStoredUser } from "../../config/auth";
+import { isAdmin, isTeamLeader, roleLabel } from "../../config/permissions";
+import { getTeams, getStaff } from "../../config/team_api/team_api";
 
-export default function Register({ onAuth }) {
-  const [name, setName] = useState("");
-  const [userId, setUserId] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Register() {
+  const currentUser = getStoredUser();
+  const [teams, setTeams] = useState([]);
+  const [staff, setStaff] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    user_id: "",
+    email: "",
+    password: "",
+    role: isTeamLeader(currentUser) ? "user" : "user",
+    team_id: currentUser?.role === "team_leader" ? currentUser?.team_id || "" : "",
+    staff_id: "",
+    status: "Active",
+  });
   const [msg, setMsg] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    Promise.allSettled([getTeams(), getStaff()]).then(([teamRes, staffRes]) => {
+      setTeams(teamRes.value?.data?.data || []);
+      setStaff(staffRes.value?.data?.data || []);
+    });
+  }, []);
+
+  const change = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -19,89 +41,106 @@ export default function Register({ onAuth }) {
     setLoading(true);
 
     try {
-      const res = await API.post("/user/register", {
-        name,
-        user_id: userId,
-        email,
-        password,
-      });
-
-      const { token, user } = res.data;
-      storeAuth(user, token);
-      if (onAuth) onAuth(user);
-
-      navigate("/dashboard"); // ✅ after register → dashboard
+      const payload = {
+        ...form,
+        role: isTeamLeader(currentUser) ? "user" : form.role,
+        team_id: isTeamLeader(currentUser) ? currentUser.team_id : form.team_id || null,
+        staff_id: form.staff_id || null,
+      };
+      await API.post("/user/register", payload);
+      setMsg({ type: "success", text: "User access created successfully" });
+      setTimeout(() => navigate("/user-dashboard"), 600);
     } catch (err) {
-      setMsg(err.response?.data?.message || "Register failed");
+      setMsg({ type: "error", text: err.response?.data?.message || "Register failed" });
     } finally {
       setLoading(false);
     }
   };
 
-return (
-  <div className="flex items-center justify-center">
-    <div className="w-full max-w-lg bg-[#020617] border border-white/10 rounded-xl shadow-xl p-8">
+  return (
+    <div className="flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl bg-[#020617] border border-white/10 rounded-2xl shadow-xl p-8">
+        <h2 className="text-2xl font-semibold mb-2 text-center text-white">Create User Access</h2>
+        <p className="text-sm text-gray-400 text-center mb-6">
+          Admin can create all roles. Team leaders can create users only inside their own team.
+        </p>
 
-      <h2 className="text-2xl font-semibold mb-2 text-center text-white">
-        Create Account
-      </h2>
-      <p className="text-sm text-gray-400 text-center mb-6">
-        Add a new user to the system
-      </p>
+        {msg && (
+          <div className={`mb-4 text-sm px-4 py-2 rounded-lg border ${msg.type === "success" ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30" : "text-red-300 bg-red-500/10 border-red-500/30"}`}>
+            {msg.text}
+          </div>
+        )}
 
-      {msg && (
-        <div className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/30 px-4 py-2 rounded-lg">
-          {msg}
-        </div>
-      )}
+        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input name="name" value={form.name} onChange={change} placeholder="Full Name" required />
+          <Input name="user_id" value={form.user_id} onChange={change} placeholder="User ID" required />
+          <Input type="email" name="email" value={form.email} onChange={change} placeholder="Email Address" required />
+          <Input type="password" name="password" value={form.password} onChange={change} placeholder="Password" required />
 
-      <form onSubmit={submit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          <div>
+            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Role</label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={change}
+              disabled={!isAdmin(currentUser)}
+              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+            >
+              <option value="user">{roleLabel("user")}</option>
+              <option value="team_leader">{roleLabel("team_leader")}</option>
+              <option value="admin">{roleLabel("admin")}</option>
+            </select>
+          </div>
 
-        <input
-          type="text"
-          placeholder="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
-          className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          <div>
+            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Team</label>
+            <select
+              name="team_id"
+              value={form.team_id || ""}
+              onChange={change}
+              disabled={isTeamLeader(currentUser)}
+              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+            >
+              <option value="">Select team</option>
+              {teams.map((team) => <option key={team.team_id} value={team.team_id}>{team.team_name}</option>)}
+            </select>
+          </div>
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          <div>
+            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Linked Staff Profile</label>
+            <select
+              name="staff_id"
+              value={form.staff_id || ""}
+              onChange={change}
+              className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Optional</option>
+              {staff.map((item) => <option key={item.staff_id} value={item.staff_id}>{item.staff_name}</option>)}
+            </select>
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          <div>
+            <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Status</label>
+            <select name="status" value={form.status} onChange={change} className="mt-1 w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-semibold transition disabled:opacity-60"
-        >
-          {loading ? "Creating account..." : "Create User"}
-        </button>
-      </form>
-
+          <button type="submit" disabled={loading} className="md:col-span-2 w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-semibold transition disabled:opacity-60">
+            {loading ? "Creating access..." : "Create User Access"}
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
+}
+
+function Input(props) {
+  return (
+    <input
+      {...props}
+      className="w-full bg-[#0f172a] border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import API from "../config/api";
+import API, { fetchMyPermissions } from "../config/api";
 import { storeAuth } from "../config/auth";
+import { setMyPermissions } from "../config/permissions";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Login({ onAuth }) {
@@ -21,6 +22,14 @@ export default function Login({ onAuth }) {
       const { token, user } = res.data;
 
       storeAuth(user, token);
+
+      try {
+        const permData = await fetchMyPermissions();
+        setMyPermissions(permData.permissions || []);
+      } catch {
+        setMyPermissions([]);
+      }
+
       if (onAuth) onAuth(user);
 
       navigate("/dashboard"); // ✅ LOGIN SUCCESS → DASHBOARD

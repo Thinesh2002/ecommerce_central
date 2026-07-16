@@ -87,3 +87,7 @@ export const getUser = getStoredUser;
 export const getToken = getAuthToken;
 export const setUser = setStoredUser;
 export const setToken = setAuthToken;
+
+export function refreshStoredUser(user) {
+  setStoredUser(user);
+}

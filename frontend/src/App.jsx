@@ -1,162 +1,124 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Layout from "./compnents/Layout";
 import ProtectedRoute from "./config/ProtectedRoute";
+import { PERMISSIONS } from "./config/permissions";
 
 import Login from "./Pages/login";
 import Register from "./Pages/user/Register";
 import Dashboard from "./Pages/dasboard";
 import User from "./Pages/user/user_dashboard";
-import TrafficReportAnalysis from "./Pages/Ebay/Ebay _File_Anaysis/eBayTrafficReportComparison";
-import EbayKeywordAnalysis from "./Pages/Ebay/Keyword_Research/index"
-import EbaySellerRoute from "./Pages/Ebay/Ebay_Seller_analysis/index"
-import TemplateRoute from "./pages/Ebay/Template_Generate/index"
-import ListingAudit from "./Pages/Ebay/Listing_Audit/index"
-import PerformanceCategory from "./Pages/Ebay/Performance tracker/index"
-import TrafficReportCompare from "./Pages/Ebay/traffic_data_analysis/index"
-import { getStoredUser, getAuthToken } from "./config/auth";
+import AccessControl from "./Pages/user/AccessControl";
 
+import TrafficReportAnalysis from "./Pages/Ebay/Ebay _File_Anaysis/eBayTrafficReportComparison";
+import EbayKeywordAnalysis from "./Pages/Ebay/Keyword_Research/index";
+import AdvancedKeywordResearch from "./Pages/Ebay/Advanced_Keyword_Research/index";
+import EbaySellerRoute from "./Pages/Ebay/Ebay_Seller_analysis/index";
+import TemplateRoute from "./Pages/Ebay/Template_Generateor/views/TemplateGeneratorView";
+import ListingAudit from "./Pages/Ebay/Listing_Audit/index";
+import PerformanceCategory from "./Pages/Ebay/Performance tracker/index";
+import TrafficReportCompare from "./Pages/Ebay/traffic_data_analysis/index";
+import TaskRoute from "./Route/task_route/index";
+import TeamRoute from "./Route/team_route/index";
+import EbayRoute from "./Route/ebay_route/index";
+
+import { getAuthToken } from "./config/auth";
 import "./index.css";
 
+function ProtectedPage({ children, permissions = [], adminOnly = false }) {
+  return (
+    <ProtectedRoute permissions={permissions} adminOnly={adminOnly}>
+      <Layout>{children}</Layout>
+    </ProtectedRoute>
+  );
+}
+
 export default function App() {
-  const [user, setUser] = useState(() => getStoredUser());
-
-  useEffect(() => {
-    const syncAuth = () => setUser(getStoredUser());
-
-    window.addEventListener("auth_change", syncAuth);
-    window.addEventListener("storage", syncAuth);
-
-    return () => {
-      window.removeEventListener("auth_change", syncAuth);
-      window.removeEventListener("storage", syncAuth);
-    };
-  }, []);
-
   const isLoggedIn = Boolean(getAuthToken());
 
   return (
     <Routes>
-      {/* PUBLIC */}
-      <Route
-        path="/login"
-        element={isLoggedIn ? <Navigate to="/dashboard" /> : <Login />}
-      />
+      <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
 
-      {/* PROTECTED */}
+      <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login />} />
+
       <Route
         path="/register"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <Register />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.USER_CREATE]}>
+            <Register />
+          </ProtectedPage>
         }
       />
 
+      <Route path="/dashboard" element={<ProtectedPage><Dashboard /></ProtectedPage>} />
+
       <Route
-        path="/dashboard"
+        path="/access-control"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage adminOnly>
+            <AccessControl />
+          </ProtectedPage>
         }
       />
 
       <Route
         path="/user-dashboard"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <User />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.USER_READ]}>
+            <User />
+          </ProtectedPage>
         }
       />
+
+      <Route path="/traffic-report-analysis" element={<ProtectedPage><TrafficReportAnalysis /></ProtectedPage>} />
+      <Route path="/performance-tracker" element={<ProtectedPage><PerformanceCategory /></ProtectedPage>} />
+      <Route path="/traffic-report-compare" element={<ProtectedPage><TrafficReportCompare /></ProtectedPage>} />
+
       <Route
-        path="/traffic-report-analysis"
+        path="/keyword-analysis"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <TrafficReportAnalysis />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.KEYWORD_READ]}>
+            <EbayKeywordAnalysis />
+          </ProtectedPage>
         }
       />
 
-            <Route
-        path="/Keyword-analysis"
+      <Route
+        path="/advanced-keyword-research"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <EbayKeywordAnalysis />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.KEYWORD_ADVANCED]}>
+            <AdvancedKeywordResearch />
+          </ProtectedPage>
         }
       />
 
-                  <Route
-        path="/Seller-analysis"
+      <Route
+        path="/seller-analysis"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <EbaySellerRoute />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.SELLER_READ]}>
+            <EbaySellerRoute />
+          </ProtectedPage>
         }
       />
 
-                        <Route
-        path="/ebay-template"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <TemplateRoute />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/ebay-template" element={<ProtectedPage><TemplateRoute /></ProtectedPage>} />
 
-                              <Route
+      <Route
         path="/listing-audit"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <ListingAudit />
-            </Layout>
-          </ProtectedRoute>
+          <ProtectedPage permissions={[PERMISSIONS.LISTING_AUDIT]}>
+            <ListingAudit />
+          </ProtectedPage>
         }
       />
 
-                              <Route
-        path="/performance-tracker"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PerformanceCategory />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-                              <Route
-        path="/trafic-report-compare"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <TrafficReportCompare />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      {/* FALLBACK */}
-      <Route
-        path="*"
-        element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />}
-      />
+      {TeamRoute}
+      {EbayRoute}
+      {TaskRoute}
+
+      <Route path="*" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );
 }

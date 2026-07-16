@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../config/api";
 import { getStoredUser } from "../../config/auth";
+import { hasPermission, PERMISSIONS, roleLabel } from "../../config/permissions";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -9,6 +10,10 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const perPage = 8;
+  const currentUser = getStoredUser();
+  const canCreateUser = hasPermission(currentUser, PERMISSIONS.USER_CREATE);
+  const canUpdateUser = hasPermission(currentUser, PERMISSIONS.USER_UPDATE);
+  const canDeleteUser = hasPermission(currentUser, PERMISSIONS.USER_DELETE);
 
   useEffect(() => {
     fetchStats();
@@ -49,7 +54,7 @@ export default function Dashboard() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this user?")) return;
     try {
-      await API.delete(`/auth/${id}`);
+      await API.delete(`/user/${id}`);
       fetchStats();
       fetchUsers();
     } catch (err) {
@@ -72,7 +77,7 @@ export default function Dashboard() {
     if (newName === null) return;
 
     try {
-      await API.put(`/auth/${u.id}`, { name: newName });
+      await API.put(`/user/${u.id}`, { name: newName });
       fetchUsers();
       fetchStats();
     } catch (err) {
@@ -165,12 +170,14 @@ export default function Dashboard() {
           Clear
         </button>
 
-        <button
-          onClick={handleAdd}
-          className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500"
-        >
-          + Add User
-        </button>
+        {canCreateUser && (
+          <button
+            onClick={handleAdd}
+            className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500"
+          >
+            + Add User
+          </button>
+        )}
       </div>
 
       {/* TABLE */}
@@ -186,6 +193,9 @@ export default function Dashboard() {
                   <th className="py-3 text-left">Name</th>
                   <th className="py-3 text-left">User ID</th>
                   <th className="py-3 text-left">Email</th>
+                  <th className="py-3 text-left">Role</th>
+                  <th className="py-3 text-left">Team</th>
+                  <th className="py-3 text-left">Status</th>
                   <th className="py-3 text-left">Created</th>
                   <th className="py-3 text-left">Actions</th>
                 </tr>
@@ -198,22 +208,29 @@ export default function Dashboard() {
                     <td className="py-3">{u.name}</td>
                     <td className="py-3">{u.user_id}</td>
                     <td className="py-3">{u.email}</td>
+                    <td className="py-3">{roleLabel(u.role)}</td>
+                    <td className="py-3">{u.team_name || u.team_id || "-"}</td>
+                    <td className="py-3">{u.status || "Active"}</td>
                     <td className="py-3 text-xs text-gray-400">
                       {u.created_at}
                     </td>
                     <td className="py-3 space-x-2">
-                      <button
-                        onClick={() => handleEdit(u)}
-                        className="px-2 py-1 text-xs rounded border border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(u.id)}
-                        className="px-2 py-1 text-xs rounded border border-red-500 text-red-400 hover:bg-red-500/10"
-                      >
-                        Delete
-                      </button>
+                      {canUpdateUser && (
+                        <button
+                          onClick={() => handleEdit(u)}
+                          className="px-2 py-1 text-xs rounded border border-blue-500 text-blue-400 hover:bg-blue-500/10"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {canDeleteUser && (
+                        <button
+                          onClick={() => handleDelete(u.id)}
+                          className="px-2 py-1 text-xs rounded border border-red-500 text-red-400 hover:bg-red-500/10"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
