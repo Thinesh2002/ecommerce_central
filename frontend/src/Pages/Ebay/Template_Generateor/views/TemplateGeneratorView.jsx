@@ -109,101 +109,99 @@ export default function TemplateGeneratorView() {
   };
 
   return (
-    <div className="w-full text-gray-800 font-sans h-screen flex flex-col overflow-hidden">
-      <header className="border-b border-gray-200 pb-4 flex flex-wrap justify-between items-center gap-4 shrink-0">
-        <div className="flex items-center space-x-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></div>
-          <h1 className="text-lg font-bold tracking-wider uppercase text-gray-900">A+ Template Engine</h1>
+    <div className="w-full h-full flex flex-col overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 shrink-0">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Template Generator</p>
+          <h1 className="text-xl font-bold text-slate-900">A+ Content Builder</h1>
         </div>
-        <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200 space-x-1">
+        <div className="flex gap-1 rounded-sm border border-slate-200 bg-white p-1">
           {['editor', 'pc', 'mobile', 'html'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all duration-200 ${
-                activeTab === tab ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'
+              className={`rounded-sm px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                activeTab === tab ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               {tab === 'pc' || tab === 'mobile' ? `${tab} View` : tab}
             </button>
           ))}
         </div>
-      </header>
+      </div>
 
-      <main className="pt-6 w-full flex-1 overflow-hidden">
+      <main className="w-full flex-1 overflow-hidden">
         {activeTab === 'editor' ? (
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full h-full overflow-hidden">
-            <div className="xl:col-span-4 space-y-6 h-[calc(100vh-120px)] overflow-y-auto pr-2 scrollbar-thin">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 w-full h-full overflow-hidden">
+            <div className="xl:col-span-4 space-y-5 h-full overflow-y-auto pr-2">
               <HeaderEditor headerData={headerData} setHeaderData={setHeaderData} />
               <StyleCustomizer styles={styles} setStyles={setStyles} />
-              <ModuleControls 
-                modules={modules} 
-                addModule={addModule} 
-                removeModule={removeModule} 
-                moveModule={moveModule} 
+              <ModuleControls
+                modules={modules}
+                addModule={addModule}
+                removeModule={removeModule}
+                moveModule={moveModule}
                 updateModule={updateModule}
                 faqs={faqs}
                 setFaqs={setFaqs}
               />
             </div>
-            
+
             {/* Live Canvas Viewport Section with active inline toggle triggers */}
-            <div className="xl:col-span-8 bg-white rounded-2xl border border-gray-200 p-6 h-[calc(100vh-120px)] overflow-y-auto shadow-sm flex flex-col">
+            <div className="xl:col-span-8 rounded-sm border border-[#D5D9D9] bg-white p-5 h-full overflow-y-auto flex flex-col">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 shrink-0">
-                <div className="text-gray-400 text-xs uppercase font-bold tracking-widest">Live Canvas Feed</div>
-                
-                {/* NEW: Editor workspace dynamic screen alignment layout selectors */}
-                <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                  <button 
+                <div className="text-slate-400 text-xs uppercase font-bold tracking-widest">Live Preview</div>
+
+                <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-sm border border-slate-200">
+                  <button
                     onClick={() => setEditorPreviewMode('pc')}
-                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
+                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-sm transition-all ${
                       editorPreviewMode === 'pc' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    PC Mockup
+                    PC
                   </button>
-                  <button 
+                  <button
                     onClick={() => setEditorPreviewMode('mobile')}
-                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
+                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-sm transition-all ${
                       editorPreviewMode === 'mobile' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    Mobile Mockup
+                    Mobile
                   </button>
                 </div>
               </div>
 
-              {/* Core live view frame that adjusts widths dynamically based on the toggle state */}
               <div className="flex-1 overflow-y-auto w-full flex justify-center items-start">
                 <div className={`transition-all duration-300 w-full ${
-                  editorPreviewMode === 'mobile' ? 'max-w-[375px] border-x border-slate-200 shadow-md rounded-xl overflow-hidden bg-white' : 'max-w-full'
+                  editorPreviewMode === 'mobile' ? 'max-w-95 border-x border-slate-200 shadow-md rounded-sm overflow-hidden bg-white' : 'max-w-full'
                 }`}>
-                  <ModulePreview 
-                    mode={editorPreviewMode} 
-                    styles={styles} 
-                    headerData={headerData} 
-                    modules={modules} 
-                    faqs={faqs} 
+                  <ModulePreview
+                    mode={editorPreviewMode}
+                    styles={styles}
+                    headerData={headerData}
+                    modules={modules}
+                    faqs={faqs}
                   />
                 </div>
               </div>
             </div>
           </div>
         ) : activeTab === 'pc' ? (
-          <div className="bg-white rounded-2xl w-full h-[calc(100vh-120px)] overflow-y-auto border border-gray-200">
+          <div className="rounded-sm border border-[#D5D9D9] bg-white w-full h-full overflow-y-auto">
             <ModulePreview mode="pc" styles={styles} headerData={headerData} modules={modules} faqs={faqs} />
           </div>
         ) : activeTab === 'mobile' ? (
-          <div className="w-full h-[calc(100vh-120px)] overflow-y-auto">
-            <div className="max-w-[420px] mx-auto bg-white rounded-[40px] p-3 border-[12px] border-gray-900 shadow-xl relative my-4">
-              <div className="h-4 w-28 bg-gray-900 absolute top-0 left-1/2 transform -translate-x-1/2 rounded-b-xl z-20"></div>
-              <div className="overflow-y-auto max-h-[700px] scrollbar-none rounded-2xl">
+          <div className="w-full h-full overflow-y-auto">
+            <div className="max-w-105 mx-auto bg-white rounded-[40px] p-3 border-12 border-slate-900 shadow-xl relative my-4">
+              <div className="h-4 w-28 bg-slate-900 absolute top-0 left-1/2 transform -translate-x-1/2 rounded-b-xl z-20"></div>
+              <div className="overflow-y-auto max-h-175 scrollbar-none rounded-2xl">
                 <ModulePreview mode="mobile" styles={styles} headerData={headerData} modules={modules} faqs={faqs} />
               </div>
             </div>
           </div>
         ) : (
-          <div className="w-full h-[calc(100vh-120px)] overflow-y-auto">
+          <div className="w-full h-full overflow-y-auto">
             <OutputManager styles={styles} headerData={headerData} modules={modules} faqs={faqs} />
           </div>
         )}

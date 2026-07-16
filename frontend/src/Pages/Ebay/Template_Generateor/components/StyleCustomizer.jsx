@@ -4,38 +4,41 @@ export default function StyleCustomizer({ styles, setStyles }) {
   const updateStyle = (key, val) => setStyles({ ...styles, [key]: val });
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6">
-      <h3 className="text-md font-bold text-orange-400 uppercase tracking-wider mb-4">2. Visual Brand Aesthetics</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="rounded-sm border border-[#D5D9D9] bg-white p-5 space-y-4">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">2. Brand Style</h3>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <ColorField label="Primary Color" value={styles.primaryColor} onChange={(v) => updateStyle('primaryColor', v)} />
+        <ColorField label="Canvas Background" value={styles.backgroundColor} onChange={(v) => updateStyle('backgroundColor', v)} />
+        <ColorField label="Text Color" value={styles.textColor} onChange={(v) => updateStyle('textColor', v)} />
+        <ColorField label="Header Background" value={styles.headerBg} onChange={(v) => updateStyle('headerBg', v)} />
+        <ColorField label="Header Text" value={styles.headerText} onChange={(v) => updateStyle('headerText', v)} />
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Primary Color</label>
-          <input type="color" value={styles.primaryColor} onChange={e => updateStyle('primaryColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-transparent" />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Canvas Background</label>
-          <input type="color" value={styles.backgroundColor} onChange={e => updateStyle('backgroundColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-transparent" />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Typography Text</label>
-          <input type="color" value={styles.textColor} onChange={e => updateStyle('textColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-transparent" />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Header Background</label>
-          <input type="color" value={styles.headerBg} onChange={e => updateStyle('headerBg', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-transparent" />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Header Typography</label>
-          <input type="color" value={styles.headerText} onChange={e => updateStyle('headerText', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-transparent" />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Font Engine Family</label>
-          <select value={styles.fontFamily} onChange={e => updateStyle('fontFamily', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-            <option value="sans-serif">Modern Sans-Serif</option>
-            <option value="serif">Classic Serif</option>
-            <option value="monospace">Technical Monospace</option>
+          <label className="mb-1 block text-xs font-semibold text-slate-500">Font Family</label>
+          <select
+            value={styles.fontFamily}
+            onChange={e => updateStyle('fontFamily', e.target.value)}
+            className="w-full rounded-sm border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+          >
+            <option value="sans-serif">Sans-Serif</option>
+            <option value="serif">Serif</option>
+            <option value="monospace">Monospace</option>
           </select>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ColorField({ label, value, onChange }) {
+  return (
+    <div>
+      <label className="mb-1 block text-xs font-semibold text-slate-500">{label}</label>
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-10 w-full cursor-pointer rounded-sm border border-slate-300 bg-white"
+      />
     </div>
   );
 }
