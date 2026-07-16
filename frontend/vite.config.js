@@ -10,6 +10,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // We register the service worker ourselves in main.jsx so a detected update can
+      // force an immediate reload - otherwise an already-open tab keeps running the old
+      // JS bundle until the user manually hard-refreshes, which looked like recurring bugs.
+      injectRegister: false,
       manifest: {
         name: 'Digitweb eBay Team Dashboard',
         short_name: 'Digitweb',
