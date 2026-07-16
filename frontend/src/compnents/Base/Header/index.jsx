@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Bell, LogOut, LayoutGrid } from "lucide-react";
+import { Search, Bell, LogOut, LayoutGrid, Menu, X } from "lucide-react";
 import { getStoredUser, logout } from "../../../config/auth";
 import { clearMyPermissions, roleLabel } from "../../../config/permissions";
 import { buildSearchableNav } from "../../../config/navItems";
 
-export default function Header() {
+export default function Header({ onMenuClick, sidebarOpen }) {
   const [now, setNow] = useState(new Date());
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -59,6 +59,15 @@ export default function Header() {
       <div className="h-full flex items-center gap-3 px-3 sm:px-4">
         {/* LOGO */}
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="flex items-center justify-center rounded p-1.5 text-slate-300 hover:bg-white/10 hover:text-white lg:hidden"
+            aria-label="Toggle menu"
+          >
+            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+
           <div className="flex h-8 w-8 items-center justify-center rounded bg-[#FF9900] text-[#131A22] font-black">
             <LayoutGrid size={16} />
           </div>
