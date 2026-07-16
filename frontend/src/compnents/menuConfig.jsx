@@ -25,6 +25,11 @@ export const menuSections = [
         label: "Template Generator",
         subLinks: [{ to: "/ebay-template", label: "HTML Generator" }],
       },
+      {
+        to: "/listing-audit",
+        label: "Listing Audit",
+        subLinks: [{ to: "/listing-audit", label: "Audit Tool" }],
+      },
     ],
   },
   {

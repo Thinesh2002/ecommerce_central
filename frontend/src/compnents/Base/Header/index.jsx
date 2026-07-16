@@ -1,37 +1,52 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, LogOut, X } from "lucide-react";
+import { Search, Bell, LogOut, LayoutGrid } from "lucide-react";
 import { getStoredUser, logout } from "../../../config/auth";
 import { clearMyPermissions, roleLabel } from "../../../config/permissions";
+import { buildSearchableNav } from "../../../config/navItems";
 
-export default function Header({ onMenuClick, sidebarOpen }) {
+export default function Header() {
   const [now, setNow] = useState(new Date());
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef(null);
   const navigate = useNavigate();
   const user = getStoredUser();
+  const searchableNav = useMemo(() => buildSearchableNav(user), [user]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const liveTime = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Colombo",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
     hour12: true,
   }).format(now);
 
-  const liveDate = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Colombo",
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(now);
+  const matches = query.trim()
+    ? searchableNav
+        .filter((item) => item.searchText.includes(query.trim().toLowerCase()))
+        .slice(0, 6)
+    : [];
+
+  const goTo = (to) => {
+    setQuery("");
+    setSearchOpen(false);
+    navigate(to);
+  };
 
   const handleLogout = () => {
     logout();
@@ -40,37 +55,69 @@ export default function Header({ onMenuClick, sidebarOpen }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 h-12 border-b border-slate-200 bg-white shadow-sm">
-      <div className="h-full flex items-center justify-between gap-3 px-2 sm:px-4">
-        {/* LEFT: MENU + HEADING */}
-        <div className="flex items-center gap-2 min-w-0">
-          <button
-            type="button"
-            onClick={onMenuClick}
-            className="cursor-pointer rounded-md p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 lg:hidden"
-            aria-label="Toggle menu"
-          >
-            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-
-          <h1 className="text-sm sm:text-base font-black text-slate-800 tracking-wide truncate">
-            Digitweb eBay Team Dashboard
-          </h1>
+    <header className="h-14 bg-[#232F3E] text-white">
+      <div className="h-full flex items-center gap-3 px-3 sm:px-4">
+        {/* LOGO */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-[#FF9900] text-[#131A22] font-black">
+            <LayoutGrid size={16} />
+          </div>
+          <span className="hidden sm:block text-sm font-bold tracking-wide">
+            Digitweb <span className="text-slate-400 font-medium">Seller Central</span>
+          </span>
         </div>
 
-        {/* RIGHT: TIME + USER + LOGOUT */}
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="text-right leading-none hidden sm:block">
-            <p className="text-sm font-black text-slate-800 tracking-wide">{liveTime}</p>
-            <p className="text-[10px] text-slate-400 font-bold mt-1">{liveDate}</p>
+        {/* SEARCH */}
+        <div ref={searchRef} className="relative flex-1 max-w-xl">
+          <div className="flex items-center rounded-sm border border-slate-300 bg-white overflow-hidden">
+            <Search size={15} className="ml-2.5 text-slate-400 shrink-0" />
+            <input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearchOpen(true);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              placeholder="Search reports, tools, pages…"
+              className="w-full px-2 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+            />
           </div>
 
+          {searchOpen && matches.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 rounded-sm border border-slate-200 bg-white shadow-lg overflow-hidden z-50">
+              {matches.map((item) => (
+                <button
+                  key={item.to}
+                  type="button"
+                  onClick={() => goTo(item.to)}
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  <span className="font-semibold">{item.label}</span>
+                  <span className="text-xs text-slate-400">{item.group}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT: TIME + BELL + ACCOUNT + LOGOUT */}
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="hidden md:block text-xs font-semibold text-slate-300">{liveTime}</span>
+
+          <button
+            type="button"
+            className="hidden sm:flex items-center justify-center rounded p-1.5 text-slate-300 hover:bg-white/10 hover:text-white"
+            aria-label="Notifications"
+          >
+            <Bell size={16} />
+          </button>
+
           {user && (
-            <div className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5">
-              <span className="text-xs font-bold text-slate-700 truncate max-w-35">
+            <div className="hidden md:flex items-center gap-2 rounded-sm border border-slate-600 px-2.5 py-1">
+              <span className="text-xs font-bold text-white truncate max-w-35">
                 {user.name || user.email || user.user_id}
               </span>
-              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100">
+              <span className="rounded-sm bg-[#FF9900]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#FFB84D]">
                 {roleLabel(user.role)}
               </span>
             </div>
@@ -79,11 +126,11 @@ export default function Header({ onMenuClick, sidebarOpen }) {
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            className="flex items-center gap-1.5 rounded-sm border border-slate-600 px-2.5 py-1.5 text-xs font-bold text-slate-300 transition hover:border-red-400 hover:bg-red-500/10 hover:text-red-300"
             aria-label="Logout"
           >
             <LogOut size={14} />
-            <span className="hidden sm:inline">Logout</span>
+            <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
       </div>
