@@ -49,7 +49,7 @@ export default function Header({ onMenuClick, menuOpen }) {
             type="button"
             data-menu-toggle
             onClick={onMenuClick}
-            className="relative z-50 flex items-center justify-center rounded p-1.5 text-slate-200 hover:bg-white/10"
+            className="flex items-center justify-center rounded p-1.5 text-slate-200 hover:bg-white/10"
             aria-label="Toggle menu"
           >
             {menuOpen ? <X size={18} /> : <MenuIcon size={18} />}

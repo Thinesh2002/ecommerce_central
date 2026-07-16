@@ -53,7 +53,7 @@ export default function Menu({ open, onClose }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
+      <div className="fixed inset-0 top-14 z-40 bg-black/40 backdrop-blur-sm" />
 
       <div
         ref={wrapperRef}
