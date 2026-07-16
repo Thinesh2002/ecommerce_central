@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Search, UserPlus, Pencil, Trash2 } from "lucide-react";
 import API from "../../config/api";
 import { getStoredUser } from "../../config/auth";
 import { hasPermission, PERMISSIONS, roleLabel } from "../../config/permissions";
@@ -85,190 +86,181 @@ export default function Dashboard() {
     }
   };
 
- return (
-  <div className="space-y-6 text-gray-200">
-    {/* PAGE TITLE */}
-    <div>
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="text-sm text-gray-400">
-        User statistics & management
-      </p>
-    </div>
-
-    {/* ================= STATS ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {/* TOTAL USERS */}
-      <div className="bg-[#020617] border border-white/10 rounded-xl p-5">
-        <p className="text-sm text-gray-400">Total Users</p>
-        <h2 className="text-3xl font-bold mt-2">
-          {stats.total ?? 0}
-        </h2>
-        <p className="text-xs text-gray-500 mt-1">
-          As of now
-        </p>
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">User Access</p>
+        <h1 className="text-xl font-bold text-slate-900">Users</h1>
       </div>
 
-      {/* RECENT USERS */}
-      <div className="md:col-span-2 bg-[#020617] border border-white/10 rounded-xl p-5">
-        <p className="text-sm text-gray-400 mb-3">
-          Recent Users
-        </p>
+      {/* ================= STATS ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="rounded-sm border border-[#D5D9D9] bg-white p-4">
+          <p className="text-xs font-semibold text-slate-500">Total Users</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{stats.total ?? 0}</p>
+        </div>
 
-        {stats.recent?.length ? (
-          <ul className="divide-y divide-white/10">
-            {stats.recent.map((u) => (
-              <li
-                key={u.id}
-                className="py-3 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-medium">
-                    {u.name || "(no name)"}{" "}
-                    <span className="text-xs text-gray-500">
-                      #{u.user_id || u.id}
-                    </span>
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {u.email}
-                  </p>
-                </div>
-                <span className="text-xs text-gray-500">
-                  {u.created_at}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500">
-            No recent users
-          </p>
-        )}
+        <div className="md:col-span-2 rounded-sm border border-[#D5D9D9] bg-white p-4">
+          <p className="mb-2 text-xs font-semibold text-slate-500">Recent Users</p>
+          {stats.recent?.length ? (
+            <ul className="divide-y divide-slate-100">
+              {stats.recent.map((u) => (
+                <li key={u.id} className="flex items-center justify-between py-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {u.name || "(no name)"}{" "}
+                      <span className="text-xs font-normal text-slate-400">#{u.user_id || u.id}</span>
+                    </p>
+                    <p className="text-xs text-slate-500 truncate">{u.email}</p>
+                  </div>
+                  <span className="shrink-0 text-xs text-slate-400">{u.created_at}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-400">No recent users</p>
+          )}
+        </div>
       </div>
-    </div>
 
-    {/* ================= USERS TABLE ================= */}
-    <div className="bg-[#020617] border border-white/10 rounded-xl p-5">
-      {/* SEARCH & ACTIONS */}
-      <div className="flex flex-col md:flex-row gap-3 mb-4">
-        <input
-          className="flex-1 bg-[#0f172a] border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Search by name, email, user id or id"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-        />
+      {/* ================= USERS TABLE ================= */}
+      <div className="rounded-sm border border-[#D5D9D9] bg-white">
+        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 md:flex-row">
+          <div className="flex flex-1 items-center rounded-sm border border-slate-300 bg-white overflow-hidden">
+            <Search size={15} className="ml-2.5 text-slate-400 shrink-0" />
+            <input
+              className="w-full px-2 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              placeholder="Search by name, email, user id or id"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
 
-        <button
-          onClick={() => {
-            setQuery("");
-            setPage(1);
-          }}
-          className="px-4 py-2 text-sm rounded-lg border border-white/10 hover:bg-white/5"
-        >
-          Clear
-        </button>
-
-        {canCreateUser && (
           <button
-            onClick={handleAdd}
-            className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500"
+            onClick={() => {
+              setQuery("");
+              setPage(1);
+            }}
+            className="rounded-sm border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
           >
-            + Add User
+            Clear
           </button>
+
+          {canCreateUser && (
+            <button
+              onClick={handleAdd}
+              className="flex items-center justify-center gap-1.5 rounded-sm bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+              <UserPlus size={15} />
+              Add User
+            </button>
+          )}
+        </div>
+
+        {loading ? (
+          <p className="p-4 text-sm text-slate-400">Loading…</p>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-left text-xs font-bold uppercase tracking-wide text-slate-400">
+                    <th className="px-4 py-3">#</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">User ID</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Role</th>
+                    <th className="px-4 py-3">Team</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Created</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginated.map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-3 text-slate-500">{u.id}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-800">{u.name}</td>
+                      <td className="px-4 py-3 text-slate-600">{u.user_id}</td>
+                      <td className="px-4 py-3 text-slate-600">{u.email}</td>
+                      <td className="px-4 py-3 text-slate-600">{roleLabel(u.role)}</td>
+                      <td className="px-4 py-3 text-slate-600">{u.team_name || u.team_id || "-"}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-sm px-2 py-0.5 text-xs font-bold ${
+                            String(u.status || "Active").toLowerCase() === "active"
+                              ? "bg-emerald-50 text-emerald-600"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {u.status || "Active"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-400">{u.created_at}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {canUpdateUser && (
+                            <button
+                              onClick={() => handleEdit(u)}
+                              className="flex items-center gap-1 rounded-sm border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                            >
+                              <Pencil size={12} />
+                              Edit
+                            </button>
+                          )}
+                          {canDeleteUser && (
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="flex items-center gap-1 rounded-sm border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 size={12} />
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {paginated.length === 0 && (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-8 text-center text-sm text-slate-400">
+                        No users found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
+              <span className="text-xs text-slate-500">{filtered.length} result(s)</span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="rounded-sm border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-600 disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                <span className="text-xs font-semibold text-slate-600">
+                  Page {page} / {totalPages}
+                </span>
+                <button
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="rounded-sm border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-600 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
-
-      {/* TABLE */}
-      {loading ? (
-        <p className="text-sm text-gray-400">Loading...</p>
-      ) : (
-        <>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-gray-400 border-b border-white/10">
-                <tr>
-                  <th className="py-3 text-left">#</th>
-                  <th className="py-3 text-left">Name</th>
-                  <th className="py-3 text-left">User ID</th>
-                  <th className="py-3 text-left">Email</th>
-                  <th className="py-3 text-left">Role</th>
-                  <th className="py-3 text-left">Team</th>
-                  <th className="py-3 text-left">Status</th>
-                  <th className="py-3 text-left">Created</th>
-                  <th className="py-3 text-left">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-white/5">
-                {paginated.map((u) => (
-                  <tr key={u.id} className="hover:bg-white/5">
-                    <td className="py-3">{u.id}</td>
-                    <td className="py-3">{u.name}</td>
-                    <td className="py-3">{u.user_id}</td>
-                    <td className="py-3">{u.email}</td>
-                    <td className="py-3">{roleLabel(u.role)}</td>
-                    <td className="py-3">{u.team_name || u.team_id || "-"}</td>
-                    <td className="py-3">{u.status || "Active"}</td>
-                    <td className="py-3 text-xs text-gray-400">
-                      {u.created_at}
-                    </td>
-                    <td className="py-3 space-x-2">
-                      {canUpdateUser && (
-                        <button
-                          onClick={() => handleEdit(u)}
-                          className="px-2 py-1 text-xs rounded border border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {canDeleteUser && (
-                        <button
-                          onClick={() => handleDelete(u.id)}
-                          className="px-2 py-1 text-xs rounded border border-red-500 text-red-400 hover:bg-red-500/10"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* PAGINATION */}
-          <div className="flex justify-between items-center mt-5">
-            <span className="text-xs text-gray-500">
-              {filtered.length} result(s)
-            </span>
-
-            <div className="space-x-2">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1 text-sm rounded border border-white/10 disabled:opacity-50"
-              >
-                Prev
-              </button>
-              <span className="text-sm">
-                Page {page} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() =>
-                  setPage((p) => Math.min(totalPages, p + 1))
-                }
-                className="px-3 py-1 text-sm rounded border border-white/10 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </div>
-  </div>
-);
-} 
+  );
+}

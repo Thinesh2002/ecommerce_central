@@ -61,7 +61,8 @@ export default function Menu({ open, onClose }) {
         onMouseLeave={() => setExpandedKey(null)}
       >
         <div ref={panelRef} className="w-64 h-screen overflow-y-auto bg-white shadow-xl">
-          <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <span className="text-sm font-bold text-slate-900">Menu</span>
             <button
               type="button"
               onClick={onClose}
@@ -70,7 +71,6 @@ export default function Menu({ open, onClose }) {
             >
               <X size={16} />
             </button>
-            <span className="text-sm font-bold text-slate-900">Menu</span>
           </div>
 
           <div className="py-1">

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, LogOut, Menu as MenuIcon, X } from "lucide-react";
+import { Settings, LogOut, Menu as MenuIcon, X, Users } from "lucide-react";
 import { getStoredUser, logout } from "../../../config/auth";
-import { clearMyPermissions, roleLabel } from "../../../config/permissions";
+import { clearMyPermissions, hasPermission, PERMISSIONS, roleLabel } from "../../../config/permissions";
 
 export default function Header({ onMenuClick, menuOpen }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -34,10 +34,17 @@ export default function Header({ onMenuClick, menuOpen }) {
     hour12: true,
   }).format(now);
 
+  const canReadUsers = hasPermission(user, PERMISSIONS.USER_READ);
+
   const handleLogout = () => {
     logout();
     clearMyPermissions();
     navigate("/login");
+  };
+
+  const goToUsers = () => {
+    setSettingsOpen(false);
+    navigate("/user-dashboard");
   };
 
   return (
@@ -89,10 +96,21 @@ export default function Header({ onMenuClick, menuOpen }) {
                   </button>
                 </div>
 
+                {canReadUsers && (
+                  <button
+                    type="button"
+                    onClick={goToUsers}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <Users size={15} />
+                    Users
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50 border-t border-slate-100"
                 >
                   <LogOut size={15} />
                   Sign out
